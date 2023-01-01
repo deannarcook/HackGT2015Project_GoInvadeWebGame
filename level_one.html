@@ -76,7 +76,7 @@ $(function() {
         else if (cmd.toString()=='sendmail bob@evilcorp.com' && step1==true){
             typed_message(term, "\nIf I set up my website at a url that's really similar, I bet he won't even look twice.\n\nFROM: cio@evilcorp.com\nTO: bob@evilcorp.com\n\nHey Bob!\nThere is an emergency on the website. Please login immediately.\nhttp://www.e-vilcorp.com\n\nGot him. His password is his birthday.\n" , 50, function() {
                 setTimeout(function() {
-                    window.href="level_two.html"
+                    window.location.href="level_two.html"
                 }, 3000);
             });
         }
