@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Invade - Level 1</title>
+	 <script src="../static/js/jquery-1.7.1.min.js"></script>
+    <script src="../static/js/jquery.mousewheel-min.js"></script>
+    <script src="../static/js/jquery.terminal-src.js"></script>
+    <link rel="stylesheet" type="text/css" href="../static/css/jquery.terminal.css">
+</head>
+<body>
+
+<script type="text/javascript">
+var step1 = false;
+$(function() {
+    var anim = false;
+    function typed(finish_typing) {
+        return function(term, message, delay, finish) {
+            anim = true;
+            var prompt = term.get_prompt();
+            var c = 0;
+            if (message.length > 0) {
+                term.set_prompt('');
+                var interval = setInterval(function() {
+                    term.insert(message[c++]);
+                    if (c == message.length) {
+                        clearInterval(interval);
+                        // execute in next interval
+                        setTimeout(function() {
+                            // swap command with prompt
+                            finish_typing(term, message, prompt);
+                            anim = false
+                            finish && finish();
+                        }, delay);
+                    }
+                }, delay);
+            }
+        };
+    }
+    var typed_prompt = typed(function(term, message, prompt) {
+        // swap command with prompt
+        term.set_command('');
+        term.set_prompt(message + ' ');
+    });
+    var typed_message = typed(function(term, message, prompt) {
+        term.set_command('');
+        term.echo(message)
+        term.set_prompt(prompt);
+    });
+
+
+    $('body').terminal(function(cmd, term) {
+        var finish = false;
+        term.set_prompt('> ');
+        var args = {command: cmd};
+        var help = "wget <url>\nsendmail <email>\nhint"
+        if (cmd.toString()=='hint' && step1==false){
+            var msg = "\nI know EvilCorp uses http://www.evilcorp.com to access their databases.\n"
+            typed_message(term, msg, 30, function() {
+                });
+        }
+        else if (cmd.toString()=='hint' && step1==true){
+            var msg = "\nWhen Bob gave me his business card, his e-mail was bob@evilcorp.com. I just need to send him a link to my website.\n"
+            typed_message(term, msg, 30, function() {
+                });
+        }
+        else if(cmd.toString() == 'help'){
+            term.echo(useColor('white', help));
+        }
+        else if(cmd.toString() == 'wget http://www.evilcorp.com'){
+            step1=true;
+            var wget_output = "--2020-09-27 04:40:47--  http://www.evilcorp.com/\nResolving www.evilcorp.com (www.evilcorp.com)... 216.58.219.164\nConnecting to www.evilcorp.com (www.evilcorp.com)|216.58.219.164|:80... connected.\nHTTP request sent, awaiting response... 200 OK\nLength: unspecified [text/html]\nSaving to: ‘index.html’[ <=>                     ] 19,232      --.-K/s   in 0.05s\n2015-09-27 04:40:47 (358 KB/s) - ‘index.html’ saved [19232]\n";
+            term.echo(wget_output);
+            typed_message(term, "\nNow I need to email an unsuspecting low-level executive the link. \nOnce they fall for my trap and log into the website, their account will be mine! \nHmm maybe I can email that douche bag Bob he might still be working at that dump.\n" , 50, function() {
+            });
+        }
+        else if (cmd.toString()=='sendmail bob@evilcorp.com' && step1==true){
+            typed_message(term, "\nIf I set up my website at a url that's really similar, I bet he won't even look twice.\n\nFROM: cio@evilcorp.com\nTO: bob@evilcorp.com\n\nHey Bob!\nThere is an emergency on the website. Please login immediately.\nhttp://www.e-vilcorp.com\n\nGot him. His password is his birthday.\n" , 50, function() {
+                setTimeout(function() {
+                    window.location.href="../templates/level_two.html"
+                }, 3000);
+            });
+        }
+        else {
+            term.echo(useColor('red',"invalid"))
+        }
+    }, {
+        name: 'xxx',
+        greetings: null,
+        onInit: function(term) {
+            // first question
+            var msg = "LEVEL 1: Phishing for Dummies\n\nEvil Corp's destruction will begin with conning one of their incompetent executives into sharing their administrative log-in credentials with me. \nA classic phishing scam should do the trick! \nFirst, I need to replicate Evil Corp's database log-in site. \n\nfor help type help";
+            typed_message(term, msg, 30, function() {
+            });
+        },
+        keydown: function(e) {
+            //disable keyboard when animating
+            if (anim) {
+                return false;
+            }
+        }
+    });
+});
+
+
+function useColor(color, text){
+    var string;
+    switch(color){
+        case 'red': string = "\033[0;31m" + text + "\033[0m";
+            break;
+        case 'green': string = "\033[0;32m" + text + "\033[0m";
+            break;
+        case 'white': string = "\033[1;37m" + text + "\033[0m";
+            break;
+        default:
+            break;
+    }
+
+    return string;
+}
+
+</script>
+
+</body>
+</html>
